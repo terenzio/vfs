@@ -106,15 +106,15 @@ func processCommand(input string, userService *service.UserService, folderServic
 // displayHelp prints the available commands to the console
 func displayHelp() {
 	fmt.Println("Available commands:")
-	fmt.Println("register [username]")
-	fmt.Println("create-folder [username] [foldername] [description]?")
-	fmt.Println("delete-folder [username] [foldername]")
-	fmt.Println("list-folders [username] [--sort-name|--sort-created] [asc|desc]")
-	fmt.Println("rename-folder [username] [foldername] [new-folder-name]")
-	fmt.Println("create-file [username] [foldername] [filename] [description]?")
-	fmt.Println("delete-file [username] [foldername] [filename]")
-	fmt.Println("list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]")
-	fmt.Println("exit")
+	fmt.Println("> register [username]")
+	fmt.Println("> create-folder [username] [foldername] [description]?")
+	fmt.Println("> delete-folder [username] [foldername]")
+	fmt.Println("> list-folders [username] [--sort-name|--sort-created] [asc|desc]")
+	fmt.Println("> rename-folder [username] [foldername] [new-folder-name]")
+	fmt.Println("> create-file [username] [foldername] [filename] [description]?")
+	fmt.Println("> delete-file [username] [foldername] [filename]")
+	fmt.Println("> list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]")
+	fmt.Println("> exit")
 }
 
 // registerUser registers a new user
