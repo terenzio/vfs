@@ -5,14 +5,15 @@ package repository
 import (
 	"encoding/json"
 	"fmt"
-	customErrors "github.com/terenzio/vfs/domain/errors"
-	"github.com/terenzio/vfs/domain/models"
 	"io/ioutil"
 	"os"
 	"regexp"
 	"sort"
 	"sync"
 	"time"
+
+	customErrors "github.com/terenzio/vfs/domain/errors"
+	"github.com/terenzio/vfs/domain/models"
 )
 
 // FileRepository handles the repository logic for files

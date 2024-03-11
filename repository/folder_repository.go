@@ -5,8 +5,6 @@ package repository
 import (
 	"encoding/json"
 	"fmt"
-	customErrors "github.com/terenzio/vfs/domain/errors"
-	"github.com/terenzio/vfs/domain/models"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -14,6 +12,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	customErrors "github.com/terenzio/vfs/domain/errors"
+	"github.com/terenzio/vfs/domain/models"
 )
 
 // FileFolderRepository handles the repository logic for folders

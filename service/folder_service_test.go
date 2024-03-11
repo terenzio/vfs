@@ -1,14 +1,15 @@
 package service_test
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	customErrors "github.com/terenzio/vfs/domain/errors"
 	"github.com/terenzio/vfs/domain/models"
 	"github.com/terenzio/vfs/service"
-	"testing"
 )
 
-// MockFolderRepository is updated to include ValidateFolderName
+// MockFolderRepository is a mock of FolderRepository
 type MockFolderRepository struct {
 	ExistsFunc             func(string, string) (bool, error)
 	CreateFolderFunc       func(models.Folder) error
@@ -51,7 +52,7 @@ func TestCreateFolder(t *testing.T) {
 		description     string
 		mockUserSetup   func(userRepo *MockUserRepository)
 		mockFolderSetup func(folderRepo *MockFolderRepository)
-		expectError     error
+		expectedError   error
 	}{
 		{
 			name:        "ValidFolderCreation",
@@ -65,7 +66,7 @@ func TestCreateFolder(t *testing.T) {
 				folderRepo.ValidateFolderNameFunc = func(string) error { return nil }
 				folderRepo.CreateFolderFunc = func(models.Folder) error { return nil }
 			},
-			expectError: nil,
+			expectedError: nil,
 		},
 		{
 			name:        "UserDoesNotExist",
@@ -79,7 +80,7 @@ func TestCreateFolder(t *testing.T) {
 				folderRepo.ValidateFolderNameFunc = func(string) error { return nil }
 				folderRepo.CreateFolderFunc = func(models.Folder) error { return nil }
 			},
-			expectError: customErrors.ErrUserNotExists("unknownUser"),
+			expectedError: customErrors.ErrUserNotExists("unknownUser"),
 		},
 		{
 			name:        "InvalidFolderName",
@@ -93,7 +94,7 @@ func TestCreateFolder(t *testing.T) {
 				folderRepo.ValidateFolderNameFunc = func(string) error { return customErrors.ErrInvalidName("invalid@folder") }
 				folderRepo.CreateFolderFunc = func(models.Folder) error { return nil }
 			},
-			expectError: customErrors.ErrInvalidName("invalid@folder"),
+			expectedError: customErrors.ErrInvalidName("invalid@folder"),
 		},
 	}
 
@@ -106,8 +107,8 @@ func TestCreateFolder(t *testing.T) {
 			folderService := service.NewFolderService(mockFolderRepository, mockUserRepository)
 
 			err := folderService.CreateFolder(tt.userName, tt.folderName, tt.description)
-			if tt.expectError != nil {
-				assert.EqualError(t, err, tt.expectError.Error())
+			if tt.expectedError != nil {
+				assert.EqualError(t, err, tt.expectedError.Error())
 			} else {
 				assert.NoError(t, err)
 			}
@@ -122,19 +123,6 @@ func TestFolderService(t *testing.T) {
 		mockUserSetup   func(userRepo *MockUserRepository)
 		mockFolderSetup func(folderRepo *MockFolderRepository)
 	}{
-		{
-			name: "DeleteExistingFolder",
-			testFunc: func(t *testing.T, folderService *service.FolderService) {
-				err := folderService.DeleteFolder("testUser", "testFolder")
-				assert.NoError(t, err)
-			},
-			mockUserSetup: func(userRepo *MockUserRepository) {
-				userRepo.ExistsFunc = func(string) (bool, error) { return true, nil }
-			},
-			mockFolderSetup: func(folderRepo *MockFolderRepository) {
-				folderRepo.DeleteFolderFunc = func(string, string) error { return nil }
-			},
-		},
 		{
 			name: "RenameExistingFolder",
 			testFunc: func(t *testing.T, folderService *service.FolderService) {

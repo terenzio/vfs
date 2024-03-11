@@ -4,12 +4,13 @@ package repository
 
 import (
 	"bufio"
-	"github.com/terenzio/vfs/domain/errors"
-	"github.com/terenzio/vfs/domain/models"
 	"os"
 	"regexp"
 	"strings"
 	"sync"
+
+	"github.com/terenzio/vfs/domain/errors"
+	"github.com/terenzio/vfs/domain/models"
 )
 
 // FileUserRepository handles the repository logic for users

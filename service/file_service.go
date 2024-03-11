@@ -3,9 +3,10 @@
 package service
 
 import (
+	"time"
+
 	"github.com/terenzio/vfs/domain/errors"
 	"github.com/terenzio/vfs/domain/models"
-	"time"
 )
 
 // FileService handles the service logic for files

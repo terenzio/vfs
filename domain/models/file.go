@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// File represents a file in the VFS
 type File struct {
 	Username    string
 	FolderName  string
@@ -14,6 +15,7 @@ type File struct {
 	CreatedAt   time.Time
 }
 
+// FileRepository is an interface that abstracts the methods for file persistence
 type FileRepository interface {
 	CreateFile(file File) error
 	DeleteFile(username, folderName, fileName string) error
