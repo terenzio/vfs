@@ -11,17 +11,17 @@ import (
 
 // MockUserRepository provides a mock implementation of the models.UserRepository interface
 type MockUserRepository struct {
-	RegisterFunc         func(models.User) error
 	ExistsFunc           func(string) (bool, error)
+	RegisterFunc         func(models.User) error
 	ValidateUsernameFunc func(string) error
-}
-
-func (m *MockUserRepository) Register(user models.User) error {
-	return m.RegisterFunc(user)
 }
 
 func (m *MockUserRepository) Exists(username string) (bool, error) {
 	return m.ExistsFunc(username)
+}
+
+func (m *MockUserRepository) Register(user models.User) error {
+	return m.RegisterFunc(user)
 }
 
 func (m *MockUserRepository) ValidateUsername(username string) error {

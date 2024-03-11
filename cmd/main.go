@@ -26,10 +26,16 @@ func main() {
 	folderRepo := repository.NewFileFolderRepository("folders.txt")
 	folderService := service.NewFolderService(folderRepo, userRepo)
 
+	// Create a new file service with a text file repository for back up
+	// Can be used for future implementation of a database repository
+	fileRepo := repository.NewFileRepository("files.txt")
+	fileService := service.NewFileService(fileRepo, folderRepo, userRepo)
+
 	fmt.Println("==== IsCoolLab: Virtual File System CLI ====")
 	fmt.Println("The current time is:", timeString)
 	fmt.Println("Type 'help' to see available commands.")
 
+	// Create a new scanner to read user input from the command line
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
@@ -116,10 +122,19 @@ func main() {
 			sortOrder := "asc"
 			if len(args) > 2 {
 				sortField = args[2]
+				if sortField != "--sort-name" && sortField != "--sort-created" {
+					fmt.Fprintln(os.Stderr, "Usage: list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]")
+					continue
+				}
 				if len(args) == 4 {
 					sortOrder = args[3]
+					if sortOrder != "asc" && sortOrder != "desc" {
+						fmt.Fprintln(os.Stderr, "Usage: list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]")
+						continue
+					}
 				}
 			}
+			// List the folders
 			folders, err := folderService.ListFolders(args[1], sortField, sortOrder)
 			if err != nil {
 
@@ -158,6 +173,96 @@ func main() {
 				for _, folder := range folders {
 					fmt.Printf(headerFmt, folder.Name, folder.Description, folder.CreatedAt.Format(time.DateTime), folder.Username)
 				}
+			}
+
+		//File commands
+		case "create-file":
+			if len(args) < 4 {
+				fmt.Println("Usage: create-file [username] [foldername] [filename] [description]")
+				continue
+			}
+			description := ""
+			if len(args) > 4 {
+				description = strings.Join(args[4:], " ")
+			}
+			err := fileService.CreateFile(args[1], args[2], args[3], description)
+			if err != nil {
+				fmt.Printf("Error: %s\n", err.Error())
+			} else {
+				fmt.Printf("Create '%s' in %s/%s successfully.\n", args[3], args[1], args[2])
+			}
+
+		case "delete-file":
+			if len(args) != 4 {
+				fmt.Println("Usage: delete-file [username] [foldername] [filename]")
+				continue
+			}
+			err := fileService.DeleteFile(args[1], args[2], args[3])
+			if err != nil {
+				fmt.Printf("Error: %s\n", err.Error())
+			} else {
+				fmt.Printf("Delete '%s' in %s/%s successfully.\n", args[3], args[1], args[2])
+			}
+		case "list-files":
+			if len(args) < 3 {
+				fmt.Fprintln(os.Stderr, "Usage: list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]")
+				continue
+			}
+			username, folderName := args[1], args[2]
+			sortField := ""
+			sortOrder := "asc" // Default sorting order
+			if len(args) > 3 {
+				sortField = args[3]
+				if sortField != "--sort-name" && sortField != "--sort-created" {
+					fmt.Fprintln(os.Stderr, "Usage: list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]")
+					continue
+				}
+				if len(args) == 5 {
+					sortOrder = args[4]
+					if sortOrder != "asc" && sortOrder != "desc" {
+						fmt.Fprintln(os.Stderr, "Usage: list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]")
+						continue
+					}
+				}
+			}
+			// List the files
+			files, err := fileService.ListFiles(username, folderName, sortField, sortOrder)
+			if err != nil {
+				fmt.Printf("Error: %s\n", err.Error())
+			} else if len(files) == 0 {
+				fmt.Println("Warning: The folder is empty.")
+			} else {
+
+				// Determine the maximum length of each field across all files
+				maxFileLen, maxFolderLen, maxDescLen, maxDateLen, maxUserLen := 0, 0, 0, 0, 0
+				for _, f := range files {
+					if len(f.Name) > maxFileLen {
+						maxFileLen = len(f.Name)
+					}
+					if len(f.Description) > maxDescLen {
+						maxDescLen = len(f.Description)
+					}
+					folderCreatedAt := f.CreatedAt.Format(time.DateTime)
+					if len(folderCreatedAt) > maxDateLen {
+						maxDateLen = len(folderCreatedAt)
+					}
+					if len(f.FolderName) > maxFolderLen {
+						maxFolderLen = len(f.FolderName)
+					}
+					if len(f.Username) > maxUserLen {
+						maxUserLen = len(f.Username)
+					}
+				}
+
+				// Print header
+				headerFmt := fmt.Sprintf("%%-%ds | %%-%ds | %%-%ds | %%-%ds | %%-%ds\n", maxFileLen, maxDescLen, maxDateLen, maxFolderLen, maxUserLen)
+				fmt.Printf(headerFmt, "Name", "Description", "Created At", "Folder", "User Name")
+				fmt.Println(strings.Repeat("-", maxFolderLen+maxDescLen+maxDateLen+maxUserLen+20))
+
+				for _, file := range files {
+					fmt.Printf(headerFmt, file.Name, file.Description, file.CreatedAt.Format(time.DateTime), file.FolderName, file.Username)
+				}
+
 			}
 
 		default:

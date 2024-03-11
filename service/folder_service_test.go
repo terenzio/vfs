@@ -10,11 +10,16 @@ import (
 
 // MockFolderRepository is updated to include ValidateFolderName
 type MockFolderRepository struct {
+	ExistsFunc             func(string, string) (bool, error)
 	CreateFolderFunc       func(models.Folder) error
 	DeleteFolderFunc       func(string, string) error
 	RenameFolderFunc       func(string, string, string) error
 	ListFoldersFunc        func(string, string, string) ([]models.Folder, error)
 	ValidateFolderNameFunc func(string) error
+}
+
+func (m *MockFolderRepository) Exists(userName, folderName string) (bool, error) {
+	return m.ExistsFunc(userName, folderName)
 }
 
 func (m *MockFolderRepository) CreateFolder(folder models.Folder) error {

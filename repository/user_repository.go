@@ -12,9 +12,10 @@ import (
 	"sync"
 )
 
+// FileUserRepository handles the repository logic for users
 type FileUserRepository struct {
 	filePath string
-	mu       sync.Mutex
+	mu       sync.Mutex // ensures thread-safe access to the file
 }
 
 // NewFileUserRepository creates a new instance of a file-based user repository

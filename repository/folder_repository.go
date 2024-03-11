@@ -5,7 +5,7 @@ package repository
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/terenzio/vfs/domain/errors"
+	customErrors "github.com/terenzio/vfs/domain/errors"
 	"github.com/terenzio/vfs/domain/models"
 	"io/ioutil"
 	"os"
@@ -16,11 +16,13 @@ import (
 	"time"
 )
 
+// FileFolderRepository handles the repository logic for folders
 type FileFolderRepository struct {
 	filePath string
 	mu       sync.Mutex // ensures thread-safe access to the file
 }
 
+// storedFolder represents the folder structure stored in the file
 type storedFolder struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
@@ -35,6 +37,7 @@ func NewFileFolderRepository(filePath string) *FileFolderRepository {
 	}
 }
 
+// loadFolders loads the folders from the file
 func (r *FileFolderRepository) loadFolders() ([]storedFolder, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -57,6 +60,7 @@ func (r *FileFolderRepository) loadFolders() ([]storedFolder, error) {
 	return folders, nil
 }
 
+// saveFolders saves the folders to the file
 func (r *FileFolderRepository) saveFolders(folders []storedFolder) error {
 	data, err := json.Marshal(folders)
 	if err != nil {
@@ -66,6 +70,23 @@ func (r *FileFolderRepository) saveFolders(folders []storedFolder) error {
 	return ioutil.WriteFile(r.filePath, data, 0644)
 }
 
+// Exists checks if a folder already exists for a user
+func (r *FileFolderRepository) Exists(userName, folderName string) (bool, error) {
+	folders, err := r.loadFolders()
+	if err != nil {
+		return false, err
+	}
+
+	// Check for existing folder with same name under the same username
+	for _, f := range folders {
+		if strings.EqualFold(f.Name, folderName) && f.Username == userName {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// CreateFolder adds a new folder to the repository
 func (r *FileFolderRepository) CreateFolder(folder models.Folder) error {
 	folders, err := r.loadFolders()
 	if err != nil {
@@ -75,7 +96,7 @@ func (r *FileFolderRepository) CreateFolder(folder models.Folder) error {
 	// Check for existing folder with same name under the same username
 	for _, f := range folders {
 		if strings.EqualFold(f.Name, folder.Name) && f.Username == folder.Username {
-			return errors.ErrFolderExists(folder.Name)
+			return customErrors.ErrFolderExists(folder.Name)
 		}
 	}
 
@@ -89,6 +110,7 @@ func (r *FileFolderRepository) CreateFolder(folder models.Folder) error {
 	return r.saveFolders(folders)
 }
 
+// DeleteFolder deletes a folder
 func (r *FileFolderRepository) DeleteFolder(username, folderName string) error {
 	folders, err := r.loadFolders()
 	if err != nil {
@@ -106,12 +128,13 @@ func (r *FileFolderRepository) DeleteFolder(username, folderName string) error {
 	}
 
 	if !found {
-		return errors.ErrFolderNotFound(folderName)
+		return customErrors.ErrFolderNotFound(folderName)
 	}
 
 	return r.saveFolders(folders)
 }
 
+// RenameFolder renames a folder
 func (r *FileFolderRepository) RenameFolder(username, folderName, newFolderName string) error {
 	folders, err := r.loadFolders()
 	if err != nil {
@@ -123,7 +146,7 @@ func (r *FileFolderRepository) RenameFolder(username, folderName, newFolderName 
 			// Check if new name already exists
 			for _, f2 := range folders {
 				if f2.Username == username && strings.EqualFold(f2.Name, newFolderName) {
-					return errors.ErrFolderExists(newFolderName)
+					return customErrors.ErrFolderExists(newFolderName)
 				}
 			}
 
@@ -132,9 +155,10 @@ func (r *FileFolderRepository) RenameFolder(username, folderName, newFolderName 
 		}
 	}
 
-	return errors.ErrFolderNotFound(folderName)
+	return customErrors.ErrFolderNotFound(folderName)
 }
 
+// ListFolders returns a slice of folders sorted based on the specified field and order.
 func (r *FileFolderRepository) ListFolders(username, sortField, sortOrder string) ([]models.Folder, error) {
 	folders, err := r.loadFolders()
 	if err != nil {
@@ -158,7 +182,7 @@ func (r *FileFolderRepository) ListFolders(username, sortField, sortOrder string
 		return nil, fmt.Errorf("no folders found for user %s", username)
 	}
 
-	// Sorting
+	// Sorting the folders
 	switch sortField {
 	case "--sort-name":
 		sort.Slice(userFolders, func(i, j int) bool {
@@ -186,16 +210,17 @@ func (r *FileFolderRepository) ListFolders(username, sortField, sortOrder string
 
 // ValidateFolderName checks if the folder name is valid.
 // It must contain only alphabets (uppercase and lowercase) and numbers, no spaces.
+// The length of the folder name must be less than or equal to 30 characters.
 func (r *FileFolderRepository) ValidateFolderName(folderName string) error {
 	// Check the length of the folder name first
 	if len(folderName) > 30 {
-		return errors.ErrNameTooLong(folderName)
+		return customErrors.ErrNameTooLong(folderName)
 	}
 
 	// Regular expression to match usernames containing only alphabets and numbers.
 	validFolderNameRegex := regexp.MustCompile(`^[A-Za-z0-9]+$`)
 	if !validFolderNameRegex.MatchString(folderName) {
-		return errors.ErrInvalidName(folderName)
+		return customErrors.ErrInvalidName(folderName)
 	}
 
 	return nil

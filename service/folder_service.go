@@ -19,6 +19,7 @@ func NewFolderService(folderRepo models.FolderRepository, userRepo models.UserRe
 	return &FolderService{folderRepo: folderRepo, userRepo: userRepo}
 }
 
+// CreateFolder creates a new folder
 func (s *FolderService) CreateFolder(userName, folderName, description string) error {
 
 	// Check if the user exists
@@ -45,6 +46,7 @@ func (s *FolderService) CreateFolder(userName, folderName, description string) e
 	return s.folderRepo.CreateFolder(folder)
 }
 
+// DeleteFolder deletes a folder
 func (s *FolderService) DeleteFolder(userName, folderName string) error {
 
 	// Check if the user exists
@@ -56,10 +58,16 @@ func (s *FolderService) DeleteFolder(userName, folderName string) error {
 		return errors.ErrUserNotExists(userName)
 	}
 
+	// Check if the folder folderName is valid
+	if err := s.folderRepo.ValidateFolderName(folderName); err != nil {
+		return err
+	}
+
 	// Delete the folder
 	return s.folderRepo.DeleteFolder(userName, folderName)
 }
 
+// RenameFolder renames a folder
 func (s *FolderService) RenameFolder(userName, folderName, newFolderName string) error {
 
 	// Check if the user exists
@@ -75,6 +83,7 @@ func (s *FolderService) RenameFolder(userName, folderName, newFolderName string)
 	return s.folderRepo.RenameFolder(userName, folderName, newFolderName)
 }
 
+// ListFolders lists the folders
 func (s *FolderService) ListFolders(userName, sortField, sortOrder string) ([]models.Folder, error) {
 
 	// Check if the user exists

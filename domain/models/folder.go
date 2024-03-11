@@ -14,6 +14,7 @@ type Folder struct {
 
 // FolderRepository is an interface that abstracts the methods for folder persistence
 type FolderRepository interface {
+	Exists(userName, folderName string) (bool, error)
 	CreateFolder(folder Folder) error
 	DeleteFolder(username, folderName string) error
 	RenameFolder(username, folderName, newFolderName string) error
