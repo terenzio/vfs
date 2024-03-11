@@ -9,22 +9,22 @@ import (
 	"github.com/terenzio/vfs/service"
 )
 
-// mockUserRepository provides a mock implementation of the models.UserRepository interface
-type mockUserRepository struct {
+// MockUserRepository provides a mock implementation of the models.UserRepository interface
+type MockUserRepository struct {
 	RegisterFunc         func(models.User) error
 	ExistsFunc           func(string) (bool, error)
 	ValidateUsernameFunc func(string) error
 }
 
-func (m *mockUserRepository) Register(user models.User) error {
+func (m *MockUserRepository) Register(user models.User) error {
 	return m.RegisterFunc(user)
 }
 
-func (m *mockUserRepository) Exists(username string) (bool, error) {
+func (m *MockUserRepository) Exists(username string) (bool, error) {
 	return m.ExistsFunc(username)
 }
 
-func (m *mockUserRepository) ValidateUsername(username string) error {
+func (m *MockUserRepository) ValidateUsername(username string) error {
 	return m.ValidateUsernameFunc(username)
 }
 
@@ -33,13 +33,13 @@ func TestRegister(t *testing.T) {
 	tests := []struct {
 		name          string
 		username      string
-		setupMock     func(repo *mockUserRepository)
+		setupMock     func(repo *MockUserRepository)
 		expectedError error
 	}{
 		{
 			name:     "ErrorInvalidUsername",
 			username: "invalid!!user",
-			setupMock: func(repo *mockUserRepository) {
+			setupMock: func(repo *MockUserRepository) {
 				repo.ValidateUsernameFunc = func(string) error { return customErrors.ErrInvalidName("invalid!!user") }
 			},
 			expectedError: customErrors.ErrInvalidName("invalid!!user"),
@@ -47,7 +47,7 @@ func TestRegister(t *testing.T) {
 		{
 			name:     "ErrorUserExists",
 			username: "existingUser",
-			setupMock: func(repo *mockUserRepository) {
+			setupMock: func(repo *MockUserRepository) {
 				repo.ValidateUsernameFunc = func(string) error { return nil }
 				repo.ExistsFunc = func(string) (bool, error) { return true, nil }
 			},
@@ -56,7 +56,7 @@ func TestRegister(t *testing.T) {
 		{
 			name:     "Success",
 			username: "newUser",
-			setupMock: func(repo *mockUserRepository) {
+			setupMock: func(repo *MockUserRepository) {
 				repo.ValidateUsernameFunc = func(string) error { return nil }
 				repo.ExistsFunc = func(string) (bool, error) { return false, nil }
 				repo.RegisterFunc = func(models.User) error { return nil }
@@ -67,7 +67,7 @@ func TestRegister(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := &mockUserRepository{}
+			mockRepo := &MockUserRepository{}
 			tt.setupMock(mockRepo)
 			userService := service.NewUserService(mockRepo)
 
