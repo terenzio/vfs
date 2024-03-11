@@ -40,9 +40,9 @@ func TestRegister(t *testing.T) {
 			name:     "ErrorInvalidUsername",
 			username: "invalid!!user",
 			setupMock: func(repo *mockUserRepository) {
-				repo.ValidateUsernameFunc = func(string) error { return customErrors.ErrInvalidUsername("invalid!!user") }
+				repo.ValidateUsernameFunc = func(string) error { return customErrors.ErrInvalidName("invalid!!user") }
 			},
-			expectedError: customErrors.ErrInvalidUsername("invalid!!user"),
+			expectedError: customErrors.ErrInvalidName("invalid!!user"),
 		},
 		{
 			name:     "ErrorUserExists",

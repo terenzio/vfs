@@ -70,17 +70,17 @@ func (r *FileUserRepository) Exists(username string) (bool, error) {
 
 // ValidateUsername checks if the username is valid.
 // It must contain only alphabets (uppercase and lowercase) and numbers, no spaces.
-// The length of the username must be less than or equal to 50 characters.
+// The length of the username must be less than or equal to 30 characters.
 func (r *FileUserRepository) ValidateUsername(username string) error {
 	// Check the length of the username first
-	if len(username) > 50 {
-		return errors.ErrUsernameTooLong(username)
+	if len(username) > 30 {
+		return errors.ErrNameTooLong(username)
 	}
 
 	// Regular expression to match usernames containing only alphabets and numbers.
 	validUsernameRegex := regexp.MustCompile(`^[A-Za-z0-9]+$`)
 	if !validUsernameRegex.MatchString(username) {
-		return errors.ErrInvalidUsername(username)
+		return errors.ErrInvalidName(username)
 	}
 
 	return nil
