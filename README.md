@@ -5,6 +5,20 @@ A Virtual File System Implementation for IsCoolLab by Terence Liu
 
 This project introduces a Virtual File System (VFS), implemented in Go, that emulates a Unix-like environment for managing digital files and directories. Designed with simplicity and efficiency in mind, it facilitates basic operations such as user registration, and creating, updating, deleting, and listing files and folders. Leveraging in-memory data structures for storage, it provides a non-persistent solution that resets upon reboot, offering a streamlined approach for file system management.
 
+## Usage
+
+1) Clone or unzip the repository
+2) Make sure that Golang 1.20+ is installed on your system.
+3) Enter into the /cmd directory by using the following command on a Unix-like system:
+    ```
+    $ cd cmd
+    ```
+4) Run the following command to start the VFS program: 
+    ```
+    $ go run main.go
+    ```
+
+
 ## Design Principles
 
 The VFS is grounded in several core design principles aimed at enhancing its modularity, extensibility, and overall user experience:
