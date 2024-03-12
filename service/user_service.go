@@ -16,6 +16,7 @@ func NewUserService(repo models.UserRepository) *UserService {
 }
 
 // Register registers a new user with the given username
+// It returns an error if the username is invalid, already exists, or if the registration fails
 func (s *UserService) Register(username string) error {
 	if err := s.repo.ValidateUsername(username); err != nil {
 		return err

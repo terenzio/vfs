@@ -7,7 +7,7 @@ This project introduces a Virtual File System (VFS), implemented in Go, that emu
 
 ## Setup
 
-1) Clone or unzip the repository
+1) Clone or unzip the repository.
 2) Make sure that Golang 1.20+ is installed on your system.
 3) Enter into the /cmd directory by using the following command on a Unix-like system:
     ```
@@ -84,6 +84,25 @@ This project introduces a Virtual File System (VFS), implemented in Go, that emu
 
    ```   
 
+## Input Validation
+- All input validation is done at the Service Layer, ensuring that the VFS is robust and secure against invalid or malicious inputs.
+  - All names (user / folder / file) must contain only alphabets (uppercase and lowercase) and numbers with no spaces.
+  - The length of the folder name must be less than or equal to 30 characters.
+    ```
+    ❯ cd cmd
+    ❯ go run main.go
+    
+        ==== IsCoolLab: Virtual File System CLI ====
+        The current time is: 2024-03-12 16:57:25
+        Type 'help' to see available commands.
+        
+        # register User12#$%
+        Error: The name [User12#$%] contains invalid chars. Only alphabets and numbers are allowed.
+        
+        # register user123456789012345678901234567890
+        Error: The name [user123456789012345678901234567890] is too long. The maximum length is 30 characters.
+    ```
+
 ## Unit Tests
 
 - All tests are done on the Service Layer, which contains the core directory logic of the VFS. 
@@ -158,8 +177,3 @@ The VFS architecture comprises three primary models: User, File, and Folder. Eac
 ## Conclusion
 
 The VFS project exemplifies a thoughtful application of DDD principles to create a virtual file management system that is both robust and user-centric. Its architecture not only prioritizes performance and ease of use but also ensures that the system is well-positioned for future expansion and adaptation to new technologies or storage paradigms.
-
-
-
-
-    
