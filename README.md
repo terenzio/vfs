@@ -19,69 +19,114 @@ This project introduces a Virtual File System (VFS), implemented in Go, that emu
     ```
 
 ## Available Commands
-```
-❯ go run main.go
+   ```
+   ❯ cd cmd
+   ❯ go run main.go
 
-==== IsCoolLab: Virtual File System CLI ====
-The current time is: 2024-03-12 03:26:27
-Type 'help' to see available commands.
-
-# help
-Available commands:
-> register [username]
-> create-folder [username] [foldername] [description]?
-> delete-folder [username] [foldername]
-> list-folders [username] [--sort-name|--sort-created] [asc|desc]
-> rename-folder [username] [foldername] [new-folder-name]
-> create-file [username] [foldername] [filename] [description]?
-> delete-file [username] [foldername] [filename]
-> list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]
-> exit
-```
+      ==== IsCoolLab: Virtual File System CLI ====
+      The current time is: 2024-03-12 03:26:27
+      Type 'help' to see available commands.
+      
+      # help
+      Available commands:
+      > register [username]
+      > create-folder [username] [foldername] [description]?
+      > delete-folder [username] [foldername]
+      > list-folders [username] [--sort-name|--sort-created] [asc|desc]
+      > rename-folder [username] [foldername] [new-folder-name]
+      > create-file [username] [foldername] [filename] [description]?
+      > delete-file [username] [foldername] [filename]
+      > list-files [username] [foldername] [--sort-name|--sort-created] [asc|desc]
+      > exit
+   ```
       
 
 ## Sample Usage
 
-```
-❯ cd cmd
-❯ go run main.go
+   ```
+   ❯ cd cmd
+   ❯ go run main.go
     
-==== IsCoolLab: Virtual File System CLI ====
-The current time is: 2024-03-12 03:19:29
-Type 'help' to see available commands.
+      ==== IsCoolLab: Virtual File System CLI ====
+      The current time is: 2024-03-12 03:19:29
+      Type 'help' to see available commands.
+      
+      # register user1
+      Add 'user1' successfully.
+      
+      # create-folder user1 folder1
+      Create 'folder1' successfully.
+      
+      # create-folder user1 folder2 this-is-folder-2
+      Create 'folder2' successfully.
+      
+      # list-folders user1 --sort-name asc
+      Name    | Description      | Created At          | User Name
+      -------------------------------------------------------------------
+      folder1 |                  | 2024-03-12 03:19:50 | user1
+      folder2 | this-is-folder-2 | 2024-03-12 03:20:01 | user1
+      
+      # create-file user1 folder1 config a-config-file
+      Create 'config' in user1/folder1 successfully.
+      
+      # list-files user1 folder1 --sort-name desc
+      Name   | Description   | Created At          | Folder  | User Name
+      ----------------------------------------------------------------
+      config | a-config-file | 2024-03-12 03:20:41 | folder1 | user1
+      
+      # exit
+      Removing file users.txt ...
+      Removing file folders.txt ...
+      Removing file files.txt ...
+      Removed all temp files.
+      Exiting program.
+      See you next time!
 
-# register user1
-Add 'user1' successfully.
+   ```   
 
-# create-folder user1 folder1
-Create 'folder1' successfully.
+## Unit Tests
 
-# create-folder user1 folder2 this-is-folder-2
-Create 'folder2' successfully.
-
-# list-folders user1 --sort-name asc
-Name    | Description      | Created At          | User Name
--------------------------------------------------------------------
-folder1 |                  | 2024-03-12 03:19:50 | user1
-folder2 | this-is-folder-2 | 2024-03-12 03:20:01 | user1
-
-# create-file user1 folder1 config a-config-file
-Create 'config' in user1/folder1 successfully.
-
-# list-files user1 folder1 --sort-name desc
-Name   | Description   | Created At          | Folder  | User Name
-----------------------------------------------------------------
-config | a-config-file | 2024-03-12 03:20:41 | folder1 | user1
-
-# exit
-Removing file users.txt ...
-Removing file folders.txt ...
-Removing file files.txt ...
-Removed all temp files.
-Exiting program.
-See you next time!
-
-```
+- All tests are done on the Service Layer, which contains the core directory logic of the VFS. 
+  - The tests are written in the `*_service_test.go` files, and can be run using the following command:
+    ```
+    ❯ cd service
+    ❯ go test -v
+    
+     === RUN   TestCreateFile
+     === RUN   TestCreateFile/ValidFileCreation
+     === RUN   TestCreateFile/UserDoesNotExist
+     === RUN   TestCreateFile/FolderDoesNotExist
+     === RUN   TestCreateFile/InvalidFileName
+     --- PASS: TestCreateFile (0.00s)
+     --- PASS: TestCreateFile/ValidFileCreation (0.00s)
+     --- PASS: TestCreateFile/UserDoesNotExist (0.00s)
+     --- PASS: TestCreateFile/FolderDoesNotExist (0.00s)
+     --- PASS: TestCreateFile/InvalidFileName (0.00s)
+     === RUN   TestCreateFolder
+     === RUN   TestCreateFolder/ValidFolderCreation
+     === RUN   TestCreateFolder/UserDoesNotExist
+     === RUN   TestCreateFolder/InvalidFolderName
+     --- PASS: TestCreateFolder (0.00s)
+     --- PASS: TestCreateFolder/ValidFolderCreation (0.00s)
+     --- PASS: TestCreateFolder/UserDoesNotExist (0.00s)
+     --- PASS: TestCreateFolder/InvalidFolderName (0.00s)
+     === RUN   TestFolderService
+     === RUN   TestFolderService/RenameExistingFolder
+     === RUN   TestFolderService/ListFolders
+     --- PASS: TestFolderService (0.00s)
+     --- PASS: TestFolderService/RenameExistingFolder (0.00s)
+     --- PASS: TestFolderService/ListFolders (0.00s)
+     === RUN   TestRegister
+     === RUN   TestRegister/ErrorInvalidUsername
+     === RUN   TestRegister/ErrorUserExists
+     === RUN   TestRegister/Success
+     --- PASS: TestRegister (0.00s)
+     --- PASS: TestRegister/ErrorInvalidUsername (0.00s)
+     --- PASS: TestRegister/ErrorUserExists (0.00s)
+     --- PASS: TestRegister/Success (0.00s)
+     PASS
+     ok
+    ```
 
 ## Design Principles
 
