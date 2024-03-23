@@ -44,6 +44,21 @@ func initializeServices() (*service.UserService, *service.FolderService, *servic
 	folderRepo := repository.NewFileFolderRepository("folders.txt")
 	fileRepo := repository.NewFileRepository("files.txt")
 
+	// Dependency Injection for Flexibility
+	// Can use NewUserService with a text file implementation, a database implementation, etc.
+	// It's easy to swap out with another implementation without changing the application logic.
+	// This is an example of the Dependency Injection principle.
+	// The service layer does not need to know the details of the repository implementation.
+	// It only needs to know the interface that the repository implements.
+	// This allows for flexibility and easier testing.
+	// The service layer can be tested with a mock repository that implements the same interface.
+	// This separation of concerns makes the code more modular and easier to maintain.
+	// The service layer focuses on the business logic, while the repository layer focuses on data access.
+	// This separation also allows for easier changes in the future.
+	// If the data storage needs to change from a text file to a database, only the repository implementation needs to change.
+	// The service layer remains the same, as it only interacts with the repository interface.
+	// This makes the code more adaptable to future changes and requirements.
+
 	userService := service.NewUserService(userRepo)
 	folderService := service.NewFolderService(folderRepo, userRepo)
 	fileService := service.NewFileService(fileRepo, folderRepo, userRepo)

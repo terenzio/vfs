@@ -9,6 +9,11 @@ import (
 	"github.com/terenzio/vfs/domain/models"
 )
 
+// Connecting Domain and Application Layers
+// The application layer orchestrates domain logic and handles application-specific tasks like transaction management,
+// DTOs (Data Transfer Objects), and interface adaptation. Interfaces are crucial here to interact with domain services
+// without coupling to their concrete implementations.
+
 // FileService handles the service logic for files
 type FileService struct {
 	fileRepo   models.FileRepository
